@@ -1,6 +1,6 @@
 # Creating Face-Based AR Experiences
 
-Place and animate 3D content that follows the user's face and matches facial expressions, using the TrueDepth camera on iPhone X.
+Use the information provided by a face tracking AR session to place and animate 3D content.
 
 ## Overview
 
