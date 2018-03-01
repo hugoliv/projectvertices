@@ -104,7 +104,7 @@ class ViewController: UIViewController, ARSessionDelegate {
             errorWithInfo.localizedFailureReason,
             errorWithInfo.localizedRecoverySuggestion
         ]
-        let errorMessage = messages.flatMap({ $0 }).joined(separator: "\n")
+        let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
         
         DispatchQueue.main.async {
             self.displayErrorMessage(title: "The AR session failed.", message: errorMessage)
