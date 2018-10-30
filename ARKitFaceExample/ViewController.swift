@@ -14,85 +14,65 @@ class ViewController: UIViewController, ARSessionDelegate {
     // MARK: Outlets
 
     @IBOutlet var sceneView: ARSCNView!
-
-    @IBOutlet weak var blurView: UIVisualEffectView!
-
-    lazy var statusViewController: StatusViewController = {
-        return childViewControllers.lazy.flatMap({ $0 as? StatusViewController }).first!
-    }()
+    @IBOutlet weak var tabBar: UITabBar!
 
     // MARK: Properties
 
-    /// Convenience accessor for the session owned by ARSCNView.
-    var session: ARSession {
-        return sceneView.session
-    }
-
-    var nodeForContentType = [VirtualContentType: VirtualFaceNode]()
+    var contentControllers: [VirtualContentType: VirtualContentController] = [:]
     
-    let contentUpdater = VirtualContentUpdater()
-    
-    var selectedVirtualContent: VirtualContentType = .overlayModel {
+    var selectedVirtualContent: VirtualContentType! {
         didSet {
-            // Set the selected content based on the content type.
-            contentUpdater.virtualFaceNode = nodeForContentType[selectedVirtualContent]
+            guard oldValue != nil, oldValue != selectedVirtualContent
+                else { return }
+            
+            // Remove existing content when switching types.
+            contentControllers[oldValue]?.contentNode?.removeFromParentNode()
+            
+            // If there's an anchor already (switching content), get the content controller to place initial content.
+            // Otherwise, the content controller will place it in `renderer(_:didAdd:for:)`.
+            if let anchor = currentFaceAnchor, let node = sceneView.node(for: anchor),
+                let newContent = selectedContentController.renderer(sceneView, nodeFor: anchor) {
+                node.addChildNode(newContent)
+            }
         }
     }
-
+    var selectedContentController: VirtualContentController {
+        if let controller = contentControllers[selectedVirtualContent] {
+            return controller
+        } else {
+            let controller = selectedVirtualContent.makeController()
+            contentControllers[selectedVirtualContent] = controller
+            return controller
+        }
+    }
+    
+    var currentFaceAnchor: ARFaceAnchor?
+    
     // MARK: - View Controller Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        sceneView.delegate = contentUpdater
+        sceneView.delegate = self
         sceneView.session.delegate = self
         sceneView.automaticallyUpdatesLighting = true
         
-        createFaceGeometry()
-
-        // Set the initial face content, if any.
-        contentUpdater.virtualFaceNode = nodeForContentType[selectedVirtualContent]
-
-        // Hook up status view controller callback(s).
-        statusViewController.restartExperienceHandler = { [unowned self] in
-            self.restartExperience()
-        }
+        // Set the initial face content.
+        tabBar.selectedItem = tabBar.items!.first!
+        selectedVirtualContent = VirtualContentType(rawValue: tabBar.selectedItem!.tag)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        /*
-            AR experiences typically involve moving the device without
-            touch input for some time, so prevent auto screen dimming.
-        */
+        // AR experiences typically involve moving the device without
+        // touch input for some time, so prevent auto screen dimming.
         UIApplication.shared.isIdleTimerDisabled = true
         
+        // "Reset" to run the AR session for the first time.
         resetTracking()
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        session.pause()
-    }
-    
-    // MARK: - Setup
-    
-    /// - Tag: CreateARSCNFaceGeometry
-    func createFaceGeometry() {
-        // This relies on the earlier check of `ARFaceTrackingConfiguration.isSupported`.
-        let device = sceneView.device!
-        let maskGeometry = ARSCNFaceGeometry(device: device)!
-        let glassesGeometry = ARSCNFaceGeometry(device: device)!
-        
-        nodeForContentType = [
-            .faceGeometry: Mask(geometry: maskGeometry),
-            .overlayModel: GlassesOverlay(geometry: glassesGeometry),
-            .blendShapeModel: RobotHead()
-        ]
-    }
-    
     // MARK: - ARSessionDelegate
 
     func session(_ session: ARSession, didFailWithError error: Error) {
@@ -110,57 +90,22 @@ class ViewController: UIViewController, ARSessionDelegate {
             self.displayErrorMessage(title: "The AR session failed.", message: errorMessage)
         }
     }
-
-    func sessionWasInterrupted(_ session: ARSession) {
-        blurView.isHidden = false
-        statusViewController.showMessage("""
-        SESSION INTERRUPTED
-        The session will be reset after the interruption has ended.
-        """, autoHide: false)
-    }
-
-    func sessionInterruptionEnded(_ session: ARSession) {
-        blurView.isHidden = true
-        
-        DispatchQueue.main.async {
-            self.resetTracking()
-        }
-    }
     
     /// - Tag: ARFaceTrackingSetup
     func resetTracking() {
-        statusViewController.showMessage("STARTING A NEW SESSION")
-        
         guard ARFaceTrackingConfiguration.isSupported else { return }
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
-        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
-    }
-
-    // MARK: - Interface Actions
-
-    /// - Tag: restartExperience
-    func restartExperience() {
-        // Disable Restart button for a while in order to give the session enough time to restart.
-        statusViewController.isRestartExperienceButtonEnabled = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-            self.statusViewController.isRestartExperienceButtonEnabled = true
-        }
-
-        resetTracking()
+        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
     // MARK: - Error handling
     
     func displayErrorMessage(title: String, message: String) {
-        // Blur the background.
-        blurView.isHidden = false
-        
         // Present an alert informing about the error that has occurred.
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let restartAction = UIAlertAction(title: "Restart Session", style: .default) { _ in
             alertController.dismiss(animated: true, completion: nil)
-            self.blurView.isHidden = true
             self.resetTracking()
         }
         alertController.addAction(restartAction)
@@ -168,34 +113,35 @@ class ViewController: UIViewController, ARSessionDelegate {
     }
 }
 
-extension ViewController: UIPopoverPresentationControllerDelegate {
-
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        /*
-         Popover segues should not adapt to fullscreen on iPhone, so that
-         the AR session's view controller stays visible and active.
-        */
-        return .none
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        /*
-         All segues in this app are popovers even on iPhone. Configure their popover
-         origin accordingly.
-        */
-        guard let popoverController = segue.destination.popoverPresentationController, let button = sender as? UIButton else { return }
-        popoverController.delegate = self
-        popoverController.sourceRect = button.bounds
-
-        // Set up the view controller embedded in the popover.
-        let contentSelectionController = popoverController.presentedViewController as! ContentSelectionController
-
-        // Set the initially selected virtual content.
-        contentSelectionController.selectedVirtualContent = selectedVirtualContent
-
-        // Update our view controller's selected virtual content when the selection changes.
-        contentSelectionController.selectionHandler = { [unowned self] newSelectedVirtualContent in
-            self.selectedVirtualContent = newSelectedVirtualContent
-        }
+extension ViewController: UITabBarDelegate {
+    func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+        guard let contentType = VirtualContentType(rawValue: item.tag)
+            else { fatalError("unexpected virtual content tag") }
+        selectedVirtualContent = contentType
     }
 }
+
+extension ViewController: ARSCNViewDelegate {
+        
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard let faceAnchor = anchor as? ARFaceAnchor else { return }
+        currentFaceAnchor = faceAnchor
+        
+        // If this is the first time with this anchor, get the controller to create content.
+        // Otherwise (switching content), will change content when setting `selectedVirtualContent`.
+        if node.childNodes.isEmpty, let contentNode = selectedContentController.renderer(renderer, nodeFor: faceAnchor) {
+            node.addChildNode(contentNode)
+        }
+    }
+    
+    /// - Tag: ARFaceGeometryUpdate
+    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        guard anchor == currentFaceAnchor,
+            let contentNode = selectedContentController.contentNode,
+            contentNode.parent == node
+            else { return }
+        
+        selectedContentController.renderer(renderer, didUpdate: contentNode, for: anchor)
+    }
+}
+
