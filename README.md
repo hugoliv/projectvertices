@@ -1,6 +1,6 @@
-# Creating Face-Based AR Experiences
+# Tracking and Visualizing Faces
 
-Place and animate 3D content using information provided by a face-tracking AR session.
+Detect faces in a camera feed, overlay matching virtual content, and animate facial expressions in real-time.    
 
 ## Overview
 
