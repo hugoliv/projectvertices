@@ -39,11 +39,11 @@
 		3929C4971E89EC2C00E00B60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3929C49E1E89EE4400E00B60 /* Models.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = Models.scnassets; sourceTree = "<group>"; };
 		39D8DC1A1E8ADAE600386B05 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		B3CCB090B3CBA0B000000001 /* SampleCode.xcconfig */ = {isa = PBXFileReference; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		971FFC8F4AAE1F661DD719DD /* SampleCode.xcconfig */ = {isa = PBXFileReference; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		A51C1467E68FA2B950926F70 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
 		C81DA0C51F4CC79A002AF1DA /* FaceOcclusionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceOcclusionOverlay.swift; sourceTree = "<group>"; };
 		C8904E541F4CFD000089E530 /* VirtualContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualContent.swift; sourceTree = "<group>"; };
 		C8904E561F4CFD730089E530 /* TexturedFace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexturedFace.swift; sourceTree = "<group>"; };
-		D3D692E0D3D696B000000001 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,8 +77,8 @@
 				11F053B72130CCD2005FCAF2 /* ARFaceGeometry.obj */,
 				3929C48A1E89EC2C00E00B60 /* ARKitFaceExample */,
 				3929C4891E89EC2C00E00B60 /* Products */,
-				B3CAFB00B3CB548000000001 /* Configuration */,
-				D3D50690D3D5065000000001 /* LICENSE */,
+				690A3257C5246D71602E2F11 /* Configuration */,
+				41860C938D38FA5D26934B0F /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
@@ -102,10 +102,19 @@
 			path = ARKitFaceExample;
 			sourceTree = "<group>";
 		};
-		B3CAFB00B3CB548000000001 /* Configuration */ = {
+		41860C938D38FA5D26934B0F /* LICENSE */ = {
 			isa = PBXGroup;
 			children = (
-				B3CCB090B3CBA0B000000001 /* SampleCode.xcconfig */,
+				A51C1467E68FA2B950926F70 /* LICENSE.txt */,
+			);
+			name = LICENSE;
+			path = LICENSE;
+			sourceTree = "<group>";
+		};
+		690A3257C5246D71602E2F11 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				971FFC8F4AAE1F661DD719DD /* SampleCode.xcconfig */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
@@ -123,15 +132,6 @@
 			path = "Face Overlay Content";
 			sourceTree = "<group>";
 		};
-		D3D50690D3D5065000000001 /* LICENSE */ = {
-			isa = PBXGroup;
-			children = (
-				D3D692E0D3D696B000000001 /* LICENSE.txt */,
-			);
-			name = LICENSE;
-			path = LICENSE;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -142,7 +142,6 @@
 				3929C4841E89EC2C00E00B60 /* Sources */,
 				3929C4851E89EC2C00E00B60 /* Frameworks */,
 				3929C4861E89EC2C00E00B60 /* Resources */,
-				E2C12F40E2C12BA000000001,
 			);
 			buildRules = (
 			);
@@ -237,7 +236,7 @@
 /* Begin XCBuildConfiguration section */
 		3929C4981E89EC2C00E00B60 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3CCB090B3CBA0B000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 971FFC8F4AAE1F661DD719DD /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -297,7 +296,7 @@
 		};
 		3929C4991E89EC2C00E00B60 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3CCB090B3CBA0B000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 971FFC8F4AAE1F661DD719DD /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -351,7 +350,7 @@
 		};
 		3929C49B1E89EC2C00E00B60 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3CCB090B3CBA0B000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 971FFC8F4AAE1F661DD719DD /* SampleCode.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
@@ -370,7 +369,7 @@
 		};
 		3929C49C1E89EC2C00E00B60 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3CCB090B3CBA0B000000001 /* SampleCode.xcconfig */;
+			baseConfigurationReference = 971FFC8F4AAE1F661DD719DD /* SampleCode.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";

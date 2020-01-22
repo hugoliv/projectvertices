@@ -1,6 +1,6 @@
 # Tracking and Visualizing Faces
 
-Detect faces in a camera feed, overlay matching virtual content, and animate facial expressions in real-time.    
+Detect faces in a front-camera AR experience, overlay virtual content, and animate facial expressions in real-time.    
 
 ## Overview
 
