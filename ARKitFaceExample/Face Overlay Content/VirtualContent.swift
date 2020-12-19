@@ -14,7 +14,8 @@ enum VirtualContentType: Int {
     func makeController() -> VirtualContentController {
         switch self {
         case .transforms:
-            return TransformVisualization()
+//            return TransformVisualization()
+            return ProjectMesh()
         case .texture:
             return TexturedFace()
         case .geometry:
